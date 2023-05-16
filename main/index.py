@@ -28,7 +28,7 @@ def main(page: ft.Page):
     Zaloguj=ft.Text(value="Zaloguj sie1", color="grey",text_align="CENTER",font_family='ARIAL')
     txt_Nazwa=ft.TextField(label="Nazwa: ",text_align="left",width=300, autofocus=True)
     txt_Hasło=ft.TextField(label="Hasło: ",text_align="left", autofocus=True,password=True)
-    print('hej')
+    print('joooo')
     page.add(Zaloguj,txt_Nazwa,txt_Hasło)
     def button_clicked(e):
         if not txt_Nazwa.value:
