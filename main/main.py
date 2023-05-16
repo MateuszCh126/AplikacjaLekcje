@@ -3,7 +3,8 @@ from flet import *
 import sqlite3
 import hashlib
 #lączenie z baza danych
-conn = sqlite3.connect('Uzytkownicy.db')
+global conn 
+conn= sqlite3.connect('Uzytkownicy.db',check_same_thread=False)
 
 # utworzenie tabeli uzytkownicy
 conn.execute("""
@@ -33,20 +34,39 @@ def main(page: ft.Page):
         return Zaloguj,Nazwa,Hasło
     Zaloguj,Nazwa,Hasło = create_tuple()
     page.add(
-    ft.Column(controls=[
+        ft.Column(controls=[
         ft.Text(ref=Zaloguj, value="Zaloguj sie", color="grey",text_align="CENTER",font_family='ARIAL'),
         ft.TextField(ref=Nazwa, label="Nazwa: ",text_align="left",width=300, autofocus=True),
-        ft.TextField(ref=Hasło, label="Hasło: ",text_align="left", autofocus=True)
+        ft.TextField(ref=Hasło, label="Hasło: ",text_align="left", autofocus=True,password=True)
     ],alignment=ft.MainAxisAlignment.START))
     def button_clicked(e):
-        page.add(ft.Text("Zalogowano!"))
-        page.route = "index.py"
-        page.update()
-
+        conn= sqlite3.connect('Uzytkownicy.db',check_same_thread=False)
+        cursor = conn.cursor()
+        cursor.execute("SELECT imie , haslo FROM uzytkownicy WHERE imie ='A' AND haslo ='A'")
+        result= cursor.fetchone()
+        print(result)
+        print(cursor)
+        if result is not None :
+            page.add(ft.Text("Zalogowano!1"))
+            Nazwa, Hasło = result
+            if cursor.execute("SELECT czy_admin FROM uzytkownicy WHERE czy_admin=1",):
+                print('hej')
+                page.add(ft.Text("Użytkownik jest administratorem.!"))
+                page.add(ft.Text("Zalogowano!"))
+                
+            else:
+                print('hej')
+                page.add(ft.Text("Użytkownik NIE jest administratorem.!"))
+                page.add(ft.Text("Zalogowano! ALE NIE ADMIN"))
+                
+        else:
+            print('hej')
+            page.add(ft.Text("NIE Zalogowano! ZLE DANE")) 
     page.add(ft.ElevatedButton(text="Zaloguj się", on_click=button_clicked,))
-#zabezpieczenie hasla bo to wiesz pro ludzie robia
-def hash_password(password): 
-    return hashlib.sha256(password.encode('utf-8')).hexdigest()
-    hashed_password = hash_password(Hasło)
+
+#zabezpieczenie hasla bo to wiesz pro ludzie robia TO DO REJESTRACJI BTW
+# def hash_password(password): 
+#     return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
 ft.app(target=main)
-conn.close()  
+ 
