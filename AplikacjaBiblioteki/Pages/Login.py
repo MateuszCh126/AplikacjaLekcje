@@ -57,14 +57,15 @@ class Login1(UserControl):
                 cursor.execute(f"SELECT imie , haslo FROM uzytkownicy WHERE imie ='{name}' AND haslo ='{hashed_password}'")
                 result = cursor.fetchone()
                 if result:
-                    cursor.execute(f"SELECT czy_admin FROM uzytkownicy WHERE czy_admin=1 AND imie ='{name}'")
+                    cursor.execute(f"SELECT czy_admin FROM uzytkownicy WHERE imie ='{name}'")
                     result2 = str(cursor.fetchone())
+                    print(result2)
                     if result2=='(1,)':
                         self.page.go('/Main')
-                        print("TEZ SIE UDALO")
+                        print('poszlo dla admina')
                     elif result2=='(0,)':
                         self.page.go('/Main')
-                        print("UDALO SIE")
+                        print("poszlo bez admian")
                 else:
                     txt_Nazwa.current.error_text = "Złe dane"
                     pass
@@ -76,8 +77,8 @@ class Login1(UserControl):
             Container(
                 border_radius=20,
                 bgcolor=bg2,
-                width=300,height=300,
-                padding=15,
+                width='50vw',height='50vw',
+                padding=55,
                     content=Column(
                         alignment=ft.alignment.center,
                         controls=[
@@ -111,15 +112,16 @@ class Login1(UserControl):
                
         logowanie = Container(
             Column(
+                alignment=ft.alignment.center,
                     controls=[
                         Container(
-                            height=99,width=500,
+                            height=self.page.height,width=self.page.width,
                             bgcolor=bg,
                             border_radius=35,
                             alignment=ft.alignment.center, 
                             content=Column(                         
                                 controls=[
-                                    Text('Zaloguj sie',weight=600,size=30,color=bg5,text_align="center",),
+                                    Text('Zaloguj sie',weight=600,size=60,color=bg5,text_align="right",),
                                     Pola_logowania,
                                 ],
                                 alignment=ft.alignment.center
@@ -128,5 +130,6 @@ class Login1(UserControl):
                 ]
             )
         )
+        self.page.vertical_alignment.CENTER
         return logowanie
     

@@ -2,7 +2,7 @@ import flet as ft
 from flet import *
 from Pages.Login import Login1
 from Pages.register import Register1
-from Pages.main import Main
+from Pages.index import Index1
 def views_handler(page):
     return{
         '/':View(
@@ -26,8 +26,8 @@ def views_handler(page):
             route='/Main',
             controls=[ 
                 Container(
-                    Main(page)
+                    Index1(page)
                 )
             ]
-        )
+        ),
     }

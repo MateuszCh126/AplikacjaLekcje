@@ -6,6 +6,8 @@ from Pages.Login import Login1
 print(type(Login1))
 def main(page: Page):
     page.window_full_screen=True
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    
     def route_change(route):
         page.views.clear()
         page.views.append(
@@ -21,4 +23,5 @@ def main(page: Page):
     page.on_route_change = route_change
     page.go('/')
     page.on_view_pop = view_pop
+    page.vertical_alignment.CENTER
 ft.app(target=main)

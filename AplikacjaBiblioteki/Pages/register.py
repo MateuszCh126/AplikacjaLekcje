@@ -71,8 +71,8 @@ class Register1(UserControl):
             Container(
                 border_radius=20,
                 bgcolor=bg2,
-                width=300,height=300,
-                padding=15,
+                width='50vw',height='50vw',
+                padding=55,
                     content=Column(
                         alignment=ft.alignment.center,
                         controls=[
@@ -103,17 +103,17 @@ class Register1(UserControl):
                     )
             )
         )
-        logowanie = Container(
+        rejestracja = Container(
             Column(
                     controls=[
                         Container(
-                            height=400,width=500,
+                            height=self.page.height,width=self.page.width,
                             bgcolor=bg,
                             border_radius=35,
                             alignment=ft.alignment.center, 
                             content=Column(                         
                                 controls=[
-                                    Text('Zaloguj sie',weight=600,size=30,color=bg5,text_align="center",),
+                                    Text('Zarejestruj sie',weight=600,size=60,color=bg5,text_align="right",),
                                     Pola_logowania,
                                 ],
                                 alignment=ft.alignment.center
@@ -123,4 +123,4 @@ class Register1(UserControl):
             )
         )
         
-        return logowanie
+        return rejestracja
