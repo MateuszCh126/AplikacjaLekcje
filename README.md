@@ -1,1 +1,1 @@
-Sprawozdanie ????
+Sprawozdanie ? jest pisane mamy esse bratku
