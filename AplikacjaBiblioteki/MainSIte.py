@@ -5,6 +5,7 @@ import flet as ft
 from Pages.Login import Login1
 print(type(Login1))
 def main(page: Page):
+    page.window_full_screen=True
     def route_change(route):
         page.views.clear()
         page.views.append(

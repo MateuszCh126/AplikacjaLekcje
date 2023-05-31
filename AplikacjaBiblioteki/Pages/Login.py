@@ -24,7 +24,7 @@ class Login1(UserControl):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             imie TEXT NOT NULL,
             haslo TEXT NOT NULL,
-            czy_admin INTEGER NOT NULL DEFAULT 0
+            czy_admin BOOLEAN NOT NULL DEFAULT 0
         );
             """)
 
@@ -32,6 +32,7 @@ class Login1(UserControl):
     conn.commit()
     
     def build(self):
+        self.page.window_full_screen=True
         Pola_logowania = Column(
 
         )
@@ -39,48 +40,38 @@ class Login1(UserControl):
         txt_Hasło = ft.Ref[ft.TextField]()
         
         def button_clicked_login(e):
-            print('wgl dzialam')
             if not txt_Nazwa.current.value:
                 txt_Nazwa.current.error_text = "Podaj nazwe użytkownika"
-                print('puste imei')
                 self.page.update()
             else:
                 name = txt_Nazwa.current.value
                 self.page.clean()
             if not txt_Hasło.current.value:
                 txt_Hasło.current.error_text = "Podaj Hasło"
-                print('puste haslo')
                 self.page.update()
             else:
                 password = txt_Hasło.current.value
-                print('poszlo')
                 self.page.clean()
-
-            def hash_password(password):
-
-                        return hashlib.sha256(password.encode('utf-8')).hexdigest()
-
-            hashed_password = hash_password(password)
-            print('zapyanie do bazy')
-            cursor = conn.cursor()
-            cursor.execute(f"SELECT imie , haslo FROM uzytkownicy WHERE imie ='{name}' AND haslo ='{hashed_password}'")
-            result = cursor.fetchone()
-            print(result)
-            if result:
-                cursor.execute(f"SELECT czy_admin FROM uzytkownicy WHERE czy_admin='1' AND imie ='{name}'")
-                result2 = cursor.fetchone()
-                print(result2)
-                print("cos")
-                if result2 == (1,):
-                    self.page.go('/Register')
-                    print("TEZ SIE UDALO")
-                elif result2==(0,):
-                    self.page.go('/Register')
-                    print("UDALO SIE")
-            else:
-                print(" nie UDALO SIE")
-                pass
-            self.page.update()
+                hashed_password = hash_password(password)
+                cursor = conn.cursor()
+                cursor.execute(f"SELECT imie , haslo FROM uzytkownicy WHERE imie ='{name}' AND haslo ='{hashed_password}'")
+                result = cursor.fetchone()
+                if result:
+                    cursor.execute(f"SELECT czy_admin FROM uzytkownicy WHERE czy_admin=1 AND imie ='{name}'")
+                    result2 = str(cursor.fetchone())
+                    if result2=='(1,)':
+                        self.page.go('/Main')
+                        print("TEZ SIE UDALO")
+                    elif result2=='(0,)':
+                        self.page.go('/Main')
+                        print("UDALO SIE")
+                else:
+                    txt_Nazwa.current.error_text = "Złe dane"
+                    pass
+                self.page.update()
+        def hash_password(password):
+            return hashlib.sha256(password.encode('utf-8')).hexdigest()
+        
         Pola_logowania.controls.append(
             Container(
                 border_radius=20,
@@ -111,17 +102,18 @@ class Login1(UserControl):
                                 ft.MaterialState.HOVERED: ft.BorderSide(2, bg4),},
                                 ),
                             ),
+                            
                         ]
                     )
             )
         )        
 
-                
+               
         logowanie = Container(
             Column(
                     controls=[
                         Container(
-                            height=400,width=500,
+                            height=99,width=500,
                             bgcolor=bg,
                             border_radius=35,
                             alignment=ft.alignment.center, 
@@ -136,6 +128,5 @@ class Login1(UserControl):
                 ]
             )
         )
-        
         return logowanie
     
