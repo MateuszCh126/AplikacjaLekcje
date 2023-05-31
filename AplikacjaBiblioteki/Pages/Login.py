@@ -4,21 +4,7 @@ import flet as ft
 import hashlib
 
 # lączenie z baza danych
-global conn
-conn = sqlite3.connect('Uzytkownicy.db', check_same_thread=False)
 
-# utworzenie tabeli uzytkownicy
-conn.execute("""
-    CREATE TABLE IF NOT EXISTS uzytkownicy (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        imie TEXT NOT NULL,
-        haslo TEXT NOT NULL,
-        czy_admin INTEGER NOT NULL DEFAULT 0
-    );
-""")
-
-# zapisanie zmian w bazie danych
-conn.commit()
 bg='#cdb4db'
 bg2='#ffc8dd'
 bg3='#ffafcc'
@@ -29,15 +15,72 @@ class Login1(UserControl):
     def __init__(self,page):
         super().__init__()
         self.page=page
+    global conn
+    conn = sqlite3.connect('Biblioteka.db', check_same_thread=False)
+
+    # utworzenie tabeli uzytkownicy
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS uzytkownicy (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            imie TEXT NOT NULL,
+            haslo TEXT NOT NULL,
+            czy_admin INTEGER NOT NULL DEFAULT 0
+        );
+            """)
+
+    # zapisanie zmian w bazie danych
+    conn.commit()
     
     def build(self):
         Pola_logowania = Column(
 
         )
-        txt_Nazwa = ft.TextField()
-        txt_Hasło = ft.TextField()
-
+        txt_Nazwa = ft.Ref[ft.TextField]()
+        txt_Hasło = ft.Ref[ft.TextField]()
         
+        def button_clicked_login(e):
+            print('wgl dzialam')
+            if not txt_Nazwa.current.value:
+                txt_Nazwa.current.error_text = "Podaj nazwe użytkownika"
+                print('puste imei')
+                self.page.update()
+            else:
+                name = txt_Nazwa.current.value
+                self.page.clean()
+            if not txt_Hasło.current.value:
+                txt_Hasło.current.error_text = "Podaj Hasło"
+                print('puste haslo')
+                self.page.update()
+            else:
+                password = txt_Hasło.current.value
+                print('poszlo')
+                self.page.clean()
+
+            def hash_password(password):
+
+                        return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+            hashed_password = hash_password(password)
+            print('zapyanie do bazy')
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT imie , haslo FROM uzytkownicy WHERE imie ='{name}' AND haslo ='{hashed_password}'")
+            result = cursor.fetchone()
+            print(result)
+            if result:
+                cursor.execute(f"SELECT czy_admin FROM uzytkownicy WHERE czy_admin='1' AND imie ='{name}'")
+                result2 = cursor.fetchone()
+                print(result2)
+                print("cos")
+                if result2 == (1,):
+                    self.page.go('/Register')
+                    print("TEZ SIE UDALO")
+                elif result2==(0,):
+                    self.page.go('/Register')
+                    print("UDALO SIE")
+            else:
+                print(" nie UDALO SIE")
+                pass
+            self.page.update()
         Pola_logowania.controls.append(
             Container(
                 border_radius=20,
@@ -47,9 +90,9 @@ class Login1(UserControl):
                     content=Column(
                         alignment=ft.alignment.center,
                         controls=[
-                            TextField(txt_Nazwa,label="Nazwa: ", text_align="left", width=300, autofocus=True),
-                            TextField(txt_Hasło,label="Hasło: ", text_align="left", autofocus=True, password=True,width=300),                                            
-                            ElevatedButton("Zaloguj się",on_click=button_clicked_login, bgcolor=bg3,
+                            TextField(ref=txt_Nazwa,label="Nazwa: ", text_align="left", width=300, autofocus=True),
+                            TextField(ref=txt_Hasło,label="Hasło: ", text_align="left", autofocus=True, password=True,width=300),                                            
+                            ElevatedButton("Zaloguj się",on_click=lambda e: button_clicked_login(e), bgcolor=bg3,
                                 color=bg5,
                                 style=ft.ButtonStyle(
                                 shape={ft.MaterialState.HOVERED: ft.RoundedRectangleBorder(radius=20),
@@ -71,39 +114,9 @@ class Login1(UserControl):
                         ]
                     )
             )
-        )
-        def button_clicked_login(e):
-                if not txt_Nazwa.value or not txt_Hasło.value:
-                    txt_Nazwa.error_text = "Podaj Nazwe"
-                    txt_Hasło.error_text = "Podaj Hasło"
-                    
-                else:
-                    name = txt_Nazwa.value
-                    password=txt_Hasło.value
-                    
+        )        
+
                 
-
-                def hash_password(password):
-
-                    return hashlib.sha256(password.encode('utf-8')).hexdigest()
-
-                hashed_password = hash_password(password)
-
-                cursor = conn.cursor()
-                cursor.execute(f"SELECT imie , haslo FROM uzytkownicy WHERE imie ='{name}' AND haslo ='{hashed_password}'")
-                result = cursor.fetchone()
-
-                if result:
-                    cursor.execute(f"SELECT czy_admin FROM uzytkownicy WHERE czy_admin='1' AND imie ='{name}'")
-                    result2 = cursor.fetchone()
-                    print(result2)
-                    print("cos")
-                    if result2 == (1,):
-                        self.page.go('/Register')
-                    elif result2==(0,):
-                        self.page.go('/Register')
-                else:
-                    pass
         logowanie = Container(
             Column(
                     controls=[
@@ -125,20 +138,4 @@ class Login1(UserControl):
         )
         
         return logowanie
-    def main(page: ft.Page):
-        page.title("Logowanie")
-        page.vertical_alignment = ft.CrossAxisAlignment.CENTER
-        page.theme_mode = ft.ThemeMode.DARK
-
-        # logowanie tego typu
-        def zaloguj_page():
-            page.clean()
-            page.update()
-            Zaloguj = ft.Text(value="Zaloguj sie1", color="grey", text_align="CENTER", font_family='ARIAL')
-            txt_Nazwa = ft.TextField(label="Nazwa: ", text_align="left", width=300, autofocus=True)
-            txt_Hasło = ft.TextField(label="Hasło: ", text_align="left", autofocus=True, password=True,width=300)
-
-            page.add(Zaloguj, txt_Nazwa, txt_Hasło)
-
-            
-        zaloguj_page()
+    

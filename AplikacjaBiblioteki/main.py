@@ -5,7 +5,7 @@ import hashlib
 
 # lączenie z baza danych
 global conn
-conn = sqlite3.connect('Uzytkownicy.db', check_same_thread=False)
+conn = sqlite3.connect('Biblioteka.db', check_same_thread=False)
 
 # utworzenie tabeli uzytkownicy
 conn.execute("""
